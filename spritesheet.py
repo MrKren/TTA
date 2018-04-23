@@ -13,7 +13,6 @@ class SpriteSheet(object):
         # Load the sprite sheet.
         self.sprite_sheet = pygame.image.load(file_name).convert()
  
- 
     def get_image(self, x, y, width, height):
         """ Grab a single image out of a larger spritesheet
             Pass in the x, y location of the sprite
@@ -26,7 +25,7 @@ class SpriteSheet(object):
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
  
         # Assuming black works as the transparent color
-        image.set_colorkey((255,255,255))
+        image.set_colorkey((255, 255, 255))
  
         # Return the image
         return image

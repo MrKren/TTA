@@ -1,14 +1,11 @@
-import pygame, random, os, sys
-#Requires pygame module 'pip install pygame'
-
-#Import classes
-from player_class import Player
+import pygame   # Requires pygame module 'pip install pygame'
+from player_class import Player     # Import classes
 from terrain_gen import GenTerrain
 from spritesheet import SpriteSheet
 
-#useful colours
-GREEN = (20, 255, 140)
-GREY = (210, 210 ,210)
+
+GREEN = (20, 255, 140)  # useful colours
+GREY = (210, 210, 210)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 PURPLE = (255, 0, 255)
@@ -17,100 +14,81 @@ CYAN = (0, 255, 255)
 BLUE = (100, 100, 255)
 BLACK = (0, 0, 0)
 
-#screen resolution       
-SCREENWIDTH=1080
-SCREENHEIGHT=720
+
+SCREENWIDTH = 1080   # screen resolution
+SCREENHEIGHT = 720
 
 
 def main():
-        """Main game function""" #docstring because I keep forgetting the word
-        
-        #Starts pygame
-        pygame.init()
+        """Main game function"""   # docstring because I keep forgetting the word
 
-        #Creates window
+        pygame.init()      # Starts pygame
+
         size = (SCREENWIDTH, SCREENHEIGHT)
-        screen = pygame.display.set_mode(size)
+        screen = pygame.display.set_mode(size)  # Creates window
         pygame.display.set_caption("Through The Ages")
 
-        #Sprite and terrain generation
-        player = Player()
+        player = Player()  # Sprite and terrain generation
 
         tile_sheet = SpriteSheet("Graphics/tile.png")
-        tile_image = tile_sheet.get_image(0,0,64,64)
+        tile_image = tile_sheet.get_image(0, 0, 64, 64)
         map_size = 20
         
-        font = pygame.font.Font(None, 72)
+        font = pygame.font.Font(None, 72)  # Generating Terrain
         text = font.render("Generating Terrain", 1, WHITE)
         screen.blit(text, (0, SCREENHEIGHT/2))
         pygame.display.flip()
-        TerrainGen = GenTerrain(64, map_size, map_size, tile_image)
+        terrain_gen = GenTerrain(64, map_size, map_size, tile_image)
 
-
-        #Add sprites to sprite groups
-        
-        tile_list = pygame.sprite.Group()
-        for i in TerrainGen.tile_list:
+        tile_list = pygame.sprite.Group()  # Add sprites to sprite groups
+        for i in terrain_gen.tile_list:
                 tile_list.add(i)
         
         player_sprites = pygame.sprite.Group()
         player_sprites.add(player)
 
-        
+        carry_on = True  # Allowing the user to close the window...
+        clock = pygame.time.Clock()
 
-
-        #Allowing the user to close the window...
-        carryOn = True
-        clock=pygame.time.Clock()
-
-        #Main game loop
-        while carryOn:
+        while carry_on:  # Main game loop
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        carryOn = False
+                        carry_on = False
 
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_w]:
                         for i in tile_list:
-                                i.Up(4)
+                                i.up(4)
                 if keys[pygame.K_a]:
                         for i in tile_list:
-                                i.Left(4)
+                                i.left(4)
                 if keys[pygame.K_s]:
                         for i in tile_list:
-                                i.Down(4)
+                                i.down(4)
                 if keys[pygame.K_d]:
                         for i in tile_list:
-                                i.Right(4)
+                                i.right(4)
 
-                
-                #Game Logic
-                tile_list.update()
+                tile_list.update()  # Update sprite lists
                 player_sprites.update()
 
-                #Drawing on Screen
-                screen.fill(BLACK)
-                
-                #Darw sprites (order matters)
-                tile_list.draw(screen)
+                screen.fill(BLACK)  # Drawing on Screen
+
+                tile_list.draw(screen)  # Draw sprites (order matters)
                 player_sprites.draw(screen)
 
-                #fps counter
-                font = pygame.font.Font(None, 12)
+                font = pygame.font.Font(None, 12)  # fps counter
                 fps = clock.get_fps()
                 fps = round(fps, 0)
                 text = font.render(str(fps), 1, (255, 255, 255))
                 screen.blit(text, ((SCREENWIDTH-20), 5))
 
-                #Refresh Screen
-                pygame.display.flip()
+                pygame.display.flip()  # Refresh Screen
 
-                #Number of frames per secong e.g. 60
-                clock.tick(60)
-
-                
+                clock.tick(60)  # Number of frames per second e.g. 60
 
         pygame.quit()
+
 
 if __name__ == "__main__":
         main()
