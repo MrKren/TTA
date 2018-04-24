@@ -4,6 +4,7 @@ This module is used to pull individual sprites from sprite sheets.
 import pygame
 
 
+# noinspection PyArgumentList
 class SpriteSheet(object):
     """ Class used to grab images out of a sprite sheet. """
  

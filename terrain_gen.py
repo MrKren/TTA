@@ -44,17 +44,17 @@ class GenTerrain(object):
 
 class GenTrees(object):
 
-    def __init__(self, tile_size, map_size, image, percentage):
+    def __init__(self, tile_size, map_size, images, percentage):
 
         self.tree_list = []
 
-        for i in range(map_size):
-            for j in range(map_size):
+        for i in range(map_size-2):
+            for j in range(map_size-3):
                 if random.randrange(0, 10000, 1)/10000 < percentage:
-                    xpos = i*tile_size
-                    ypos = j*tile_size
+                    xpos = (i+1)*tile_size
+                    ypos = (j+1)*tile_size
                     pos = xpos, ypos
-                    tree = Tile(image)
+                    tree = Tile(random.choice(images))
                     tree.rect.x, tree.rect.y = pos
                     self.tree_list.append(tree)
 

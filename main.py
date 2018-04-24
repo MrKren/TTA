@@ -1,6 +1,6 @@
 import pygame   # Requires pygame module 'pip install pygame'
 import random
-import math
+"""import math"""
 from player_class import Player     # Import classes
 from terrain_gen import GenTerrain, GenTrees
 from spritesheet import SpriteSheet
@@ -15,7 +15,6 @@ YELLOW = (255, 255, 0)
 CYAN = (0, 255, 255)
 BLUE = (100, 100, 255)
 BLACK = (0, 0, 0)
-
 
 SCREENWIDTH = 1080   # screen resolution
 SCREENHEIGHT = 720
@@ -35,7 +34,7 @@ def main():
         tile_sheet = SpriteSheet("tile.png")
         tile_image = tile_sheet.get_image(0, 0, 64, 64)
         tree_sheet = SpriteSheet("plant.png")
-        tree_image = tree_sheet.get_image(0, 0, 65, 155)
+        tree_image = tree_sheet.get_image(0, 0, 65, 155), tree_sheet.get_image(128, 289, 97, 125)
         map_size = 100
         tile_size = 64
 
