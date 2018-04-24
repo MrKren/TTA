@@ -36,9 +36,10 @@ def main():
         map_size = 100
         tile_size = 64
         
-        font = pygame.font.Font(None, 72)  # Generating Terrain
+        font = pygame.font.Font("freesansbold.ttf", 72)  # Generating Terrain
         text = font.render("Generating Terrain", 1, WHITE)
-        screen.blit(text, (0, SCREENHEIGHT/2))
+        text_width, text_height = font.size("Generating Terrain")
+        screen.blit(text, ((SCREENWIDTH - text_width)/2, (SCREENHEIGHT - text_height)/2))
         pygame.display.flip()
         terrain_gen = GenTerrain(tile_size, map_size, map_size, tile_image)
 
