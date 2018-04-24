@@ -6,6 +6,8 @@ from spritesheet import SpriteSheet
 from debugmode import debug_menu
 
 
+
+
 GREEN = (20, 255, 140)  # useful colours
 GREY = (210, 210, 210)
 WHITE = (255, 255, 255)
@@ -32,7 +34,7 @@ def main():
 
         player = Player()  # Sprite and terrain generation
 
-        tile_sheet = SpriteSheet("Graphics/tile.png")
+        tile_sheet = SpriteSheet("tile.png")
         tile_image = tile_sheet.get_image(0, 0, 64, 64)
         map_size = 100
         tile_size = 64
