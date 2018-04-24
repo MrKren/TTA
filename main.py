@@ -34,7 +34,7 @@ def main():
 
         tile_sheet = SpriteSheet("Graphics/tile.png")
         tile_image = tile_sheet.get_image(0, 0, 64, 64)
-        map_size = 20
+        map_size = 100
         tile_size = 64
         
         font = pygame.font.Font(None, 72)  # Generating Terrain
@@ -61,8 +61,9 @@ def main():
 
         xcoord = 0
         ycoord = 0
-        speed = 4
+        speed = 8
         debug = False
+        render_tile_list = pygame.sprite.Group()
 
         while carry_on:  # Main game loop
                 for event in pygame.event.get():
@@ -73,19 +74,20 @@ def main():
                 if keys[pygame.K_w]:
                         for i in tile_list:
                             i.up(speed)
-                            ycoord += speed/64
+                            ycoord += speed
                 if keys[pygame.K_a]:
                         for i in tile_list:
                             i.left(speed)
-                            xcoord -= speed/64
+                            xcoord -= speed
                 if keys[pygame.K_s]:
                         for i in tile_list:
                             i.down(speed)
-                            ycoord -= speed/64
+                            ycoord -= speed
                 if keys[pygame.K_d]:
                         for i in tile_list:
-                            i.right(4)
-                            xcoord += speed/64
+                            i.right(speed)
+                            xcoord += speed
+
                 if keys[pygame.K_F3] and debug is False:
                     debug = True
                     pygame.time.wait(100)
@@ -97,18 +99,25 @@ def main():
                 tile_list.update()  # Update sprite lists
                 player_sprites.update()
 
+                # rendering code for terrain
+                for i in tile_list:
+                    if abs(i.rect.x - player.rect.x) < (SCREENWIDTH/2 + tile_size):
+                        if abs(i.rect.y - player.rect.y) < (SCREENHEIGHT/2 + tile_size):
+                            render_tile_list.add(i)
+
                 screen.fill(BLACK)  # Drawing on Screen
 
-                tile_list.draw(screen)  # Draw sprites (order matters)
+                render_tile_list.draw(screen)  # Draw sprites (order matters)
                 player_sprites.draw(screen)
 
                 fps = clock.get_fps()
                 if debug:
-                    debug_menu(fps, screen, pos, SCREENWIDTH)
+                    debug_menu(fps, screen, pos, map_size, SCREENWIDTH)
 
                 pygame.display.flip()  # Refresh Screen
 
-                clock.tick(60)  # Number of frames per second e.g. 60
+                clock.tick(30)  # Number of frames per second e.g. 60
+                render_tile_list.empty()
 
         pygame.quit()
 
