@@ -2,16 +2,6 @@
 This module is used to pull individual sprites from sprite sheets.
 """
 import pygame
-import sys
-import os
-
-if getattr(sys, 'frozen', False): # PyInstaller adds this attribute
-    # Running in a bundle
-    CurrentPath = sys._MEIPASS
-else:
-    # Running in normal Python environment
-    CurrentPath = os.path.dirname(__file__)
-
 
 class SpriteSheet(object):
     """ Class used to grab images out of a sprite sheet. """
@@ -20,7 +10,7 @@ class SpriteSheet(object):
         """ Constructor. Pass in the file name of the sprite sheet. """
  
         # Load the sprite sheet.
-        self.sprite_sheet = pygame.image.load(os.path.join(CurrentPath, file_name)).convert()
+        self.sprite_sheet = pygame.image.load(file_name).convert()
  
     def get_image(self, x, y, width, height):
         """ Grab a single image out of a larger spritesheet

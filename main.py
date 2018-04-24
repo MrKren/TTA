@@ -5,9 +5,6 @@ from terrain_gen import GenTerrain
 from spritesheet import SpriteSheet
 from debugmode import debug_menu
 
-
-
-
 GREEN = (20, 255, 140)  # useful colours
 GREY = (210, 210, 210)
 WHITE = (255, 255, 255)
