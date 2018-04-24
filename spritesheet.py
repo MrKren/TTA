@@ -3,6 +3,7 @@ This module is used to pull individual sprites from sprite sheets.
 """
 import pygame
 
+
 class SpriteSheet(object):
     """ Class used to grab images out of a sprite sheet. """
  
