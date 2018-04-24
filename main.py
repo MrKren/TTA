@@ -1,7 +1,9 @@
 import pygame   # Requires pygame module 'pip install pygame'
+import random
 from player_class import Player     # Import classes
 from terrain_gen import GenTerrain
 from spritesheet import SpriteSheet
+from debugmode import debug_menu
 
 
 GREEN = (20, 255, 140)  # useful colours
@@ -33,12 +35,13 @@ def main():
         tile_sheet = SpriteSheet("Graphics/tile.png")
         tile_image = tile_sheet.get_image(0, 0, 64, 64)
         map_size = 20
+        tile_size = 64
         
         font = pygame.font.Font(None, 72)  # Generating Terrain
         text = font.render("Generating Terrain", 1, WHITE)
         screen.blit(text, (0, SCREENHEIGHT/2))
         pygame.display.flip()
-        terrain_gen = GenTerrain(64, map_size, map_size, tile_image)
+        terrain_gen = GenTerrain(tile_size, map_size, map_size, tile_image)
 
         tile_list = pygame.sprite.Group()  # Add sprites to sprite groups
         for i in terrain_gen.tile_list:
@@ -50,6 +53,17 @@ def main():
         carry_on = True  # Allowing the user to close the window...
         clock = pygame.time.Clock()
 
+        rand_x_pos = random.randint(tile_size, ((map_size-1)*tile_size)-SCREENWIDTH/2)
+        rand_y_pos = random.randint(tile_size, ((map_size-1)*tile_size)-SCREENHEIGHT/2)
+        for i in tile_list:
+            i.right(rand_x_pos)
+            i.down(rand_y_pos)
+
+        xcoord = 0
+        ycoord = 0
+        speed = 4
+        debug = False
+
         while carry_on:  # Main game loop
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -58,17 +72,28 @@ def main():
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_w]:
                         for i in tile_list:
-                                i.up(4)
+                            i.up(speed)
+                            ycoord += speed/64
                 if keys[pygame.K_a]:
                         for i in tile_list:
-                                i.left(4)
+                            i.left(speed)
+                            xcoord -= speed/64
                 if keys[pygame.K_s]:
                         for i in tile_list:
-                                i.down(4)
+                            i.down(speed)
+                            ycoord -= speed/64
                 if keys[pygame.K_d]:
                         for i in tile_list:
-                                i.right(4)
+                            i.right(4)
+                            xcoord += speed/64
+                if keys[pygame.K_F3] and debug is False:
+                    debug = True
+                    pygame.time.wait(100)
+                elif keys[pygame.K_F3] and debug is True:
+                    debug = False
+                    pygame.time.wait(100)
 
+                pos = xcoord, ycoord
                 tile_list.update()  # Update sprite lists
                 player_sprites.update()
 
@@ -77,11 +102,9 @@ def main():
                 tile_list.draw(screen)  # Draw sprites (order matters)
                 player_sprites.draw(screen)
 
-                font = pygame.font.Font(None, 12)  # fps counter
                 fps = clock.get_fps()
-                fps = round(fps, 0)
-                text = font.render(str(fps), 1, (255, 255, 255))
-                screen.blit(text, ((SCREENWIDTH-20), 5))
+                if debug:
+                    debug_menu(fps, screen, pos, SCREENWIDTH)
 
                 pygame.display.flip()  # Refresh Screen
 

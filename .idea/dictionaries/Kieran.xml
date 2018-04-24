@@ -5,6 +5,10 @@
       <w>relx</w>
       <w>rougelike</w>
       <w>spritesheet</w>
+      <w>xcoord</w>
+      <w>xpos</w>
+      <w>ycoord</w>
+      <w>ypos</w>
     </words>
   </dictionary>
 </component>
