@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
 
         super().__init__()
 
-        sprite_sheet = SpriteSheet('Graphics/character.png')
+        sprite_sheet = SpriteSheet('character.png')
         
         self.image = sprite_sheet.get_image(0, 0, 64, 64)
         self.image_original = self.image
