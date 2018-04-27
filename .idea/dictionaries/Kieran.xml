@@ -10,8 +10,10 @@
       <w>spritesheet</w>
       <w>xcoord</w>
       <w>xpos</w>
+      <w>xspeed</w>
       <w>ycoord</w>
       <w>ypos</w>
+      <w>yspeed</w>
     </words>
   </dictionary>
 </component>

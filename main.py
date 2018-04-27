@@ -5,6 +5,7 @@ from player_class import Player     # Import classes
 from terrain_gen import GenTerrain, GenTrees
 from spritesheet import SpriteSheet
 from debugmode import debug_menu
+from npc_class import NPC
 
 GREEN = (20, 255, 140)  # useful colours
 GREY = (210, 210, 210)
@@ -29,7 +30,15 @@ def main():
         screen = pygame.display.set_mode(size)  # Creates window
         pygame.display.set_caption("Through The Ages")
 
-        player = Player()  # Sprite and terrain generation
+        # important variable
+        xcoord = 0
+        ycoord = 0
+        speed = 8
+        debug = False
+        render_tile_list = pygame.sprite.Group()
+        render_tree_list = pygame.sprite.Group()
+
+        # Sprite and terrain generation
 
         tile_sheet = SpriteSheet("tile.png")
         tile_image = tile_sheet.get_image(0, 0, 64, 64)
@@ -49,17 +58,21 @@ def main():
 
         tile_list = pygame.sprite.Group()  # Add sprites to sprite groups
         for i in terrain_gen.tile_list:
-                tile_list.add(i)
+            tile_list.add(i)
         tree_list = pygame.sprite.Group()
         for i in tree_gen.tree_list:
             tree_list.add(i)
 
         # Adds player sprite
+        player = Player()
         player_sprites = pygame.sprite.Group()
         player_sprites.add(player)
-
-        carry_on = True  # Allowing the user to close the window...
-        clock = pygame.time.Clock()
+        enemy_list = pygame.sprite.Group()
+        for i in range(10):
+            i = NPC(player, speed)
+            i.rect.x = random.randint(player.rect.x, player.rect.x + tile_size*4)
+            i.rect.y = random.randint(player.rect.y, player.rect.y + tile_size*4)
+            enemy_list.add(i)
 
         rand_x_pos = random.randint(tile_size, ((map_size-1)*tile_size)-SCREENWIDTH/2)
         rand_y_pos = random.randint(tile_size, ((map_size-1)*tile_size)-SCREENHEIGHT/2)
@@ -70,17 +83,15 @@ def main():
             i.movex(-rand_x_pos)
             i.movey(-rand_y_pos)
 
-        xcoord = 0
-        ycoord = 0
-        speed = 8
-        debug = False
-        render_tile_list = pygame.sprite.Group()
-        render_tree_list = pygame.sprite.Group()
+        carry_on = True  # Allowing the user to close the window...
+        clock = pygame.time.Clock()
 
         while carry_on:  # Main game loop
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         carry_on = False
+
+                screen.fill(BLACK)  # Drawing on Screen
 
                 keys = pygame.key.get_pressed()
 
@@ -102,11 +113,14 @@ def main():
                 for i in tree_list:
                     i.movex(vx)
                     i.movey(vy)
+                for i in enemy_list:
+                    i.movex(vx)
+                    i.movey(vy)
                 for i in tile_list:
                     i.movex(vx)
                     i.movey(vy)
                     ycoord += vy
-                    xcoord += vx
+                    xcoord -= vx
 
                 if keys[pygame.K_F3] and debug is False:
                     debug = True
@@ -119,6 +133,7 @@ def main():
                 tile_list.update()  # Update sprite lists
                 tree_list.update()
                 player_sprites.update()
+                enemy_list.update(player)
 
                 # rendering code for terrain
                 for i in tile_list:
@@ -130,11 +145,10 @@ def main():
                         if abs(i.rect.y - player.rect.y) < (SCREENHEIGHT / 2 + tile_size*2):
                             render_tree_list.add(i)
 
-                screen.fill(BLACK)  # Drawing on Screen
-
                 render_tile_list.draw(screen)  # Draw sprites (order matters)
                 player_sprites.draw(screen)
                 render_tree_list.draw(screen)
+                enemy_list.draw(screen)
 
                 fps = clock.get_fps()
                 if debug:

@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         sprite_sheet = SpriteSheet('character.png')
-        
+
         self.image = sprite_sheet.get_image(0, 0, 64, 64)
         self.image_original = self.image
         self.speed = 5
@@ -32,7 +32,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         """Rotates the player so that it follows the mouse"""
         x, y = pygame.mouse.get_pos()
-        relx, rely = x-self.rect.x, y-self.rect.y
+        relx, rely = x - self.rect.x, y - self.rect.y
         angle = math.atan2(relx, rely)
         angle = math.degrees(angle)
         self.image = self.rot_center(angle)
