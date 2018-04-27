@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 from spritesheet import SpriteSheet
 
 
@@ -16,6 +17,8 @@ class NPC(pygame.sprite.Sprite):
         self.player = player
         self.player_pos = player.rect.centerx, player.rect.centery
         self.speed = speed
+        self.time = 0
+        self.move = "L"
 
     def rot_center(self, angle):
         """rotate an image while keeping its center and size"""
@@ -29,13 +32,18 @@ class NPC(pygame.sprite.Sprite):
     def update(self, player):
         """General updates for NPC"""
         # rotating player
+        self.time += 1
         self.player_pos = player.rect.centerx, player.rect.centery
         x, y = self.player_pos
         relx, rely = x-self.rect.x, y-self.rect.y
         angle = math.atan2(relx, rely)
         angle = math.degrees(angle)
         self.image = self.rot_center(angle)
-        self.move_to_player(angle)
+        if self.time > 10:
+            self.move = random.choice(["L", "R", "U", "D"])
+            self.time = 0
+        else:
+            self.ai_move(8, self.move)
 
     def movex(self, speed):
         self.rect.x += speed
@@ -43,11 +51,12 @@ class NPC(pygame.sprite.Sprite):
     def movey(self, speed):
         self.rect.y += speed
 
-    def move_to_player(self, angle):
-        xspeed, yspeed = self.speed*math.cos(angle), self.speed*math.sin(angle)
-        if abs(angle) > 90:
-            xspeed = -xspeed
-        if angle > 0:
-            yspeed = -yspeed
-        self.rect.centerx += xspeed
-        self.rect.centery += yspeed
+    def ai_move(self, speed, x):
+        if x == "L":
+            self.movex(-speed)
+        if x == "R":
+            self.movex(speed)
+        if x == "U":
+            self.movey(-speed)
+        if x == "D":
+            self.movey(speed)
