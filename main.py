@@ -1,6 +1,6 @@
 import pygame   # Requires pygame module 'pip install pygame'
 import random
-"""import math"""
+# import math
 from player_class import Player     # Import classes
 from terrain_gen import GenTerrain, GenTrees
 from spritesheet import SpriteSheet
@@ -19,6 +19,18 @@ BLACK = (0, 0, 0)
 
 SCREENWIDTH = 1080   # screen resolution
 SCREENHEIGHT = 720
+
+
+def movexy(group, vx, vy, xcoord, ycoord):
+    """Moves objects"""
+    for i in group:
+        for j in i:
+            j.movex(vx)
+            j.movey(vy)
+    for i in group[0]:
+        ycoord += vy
+        xcoord -= vx
+    return ycoord, xcoord
 
 
 def main():
@@ -44,6 +56,7 @@ def main():
         tile_image = tile_sheet.get_image(0, 0, 64, 64)
         tree_sheet = SpriteSheet("plant.png")
         tree_image = tree_sheet.get_image(0, 0, 65, 155), tree_sheet.get_image(128, 289, 97, 125)
+        trunk_image = tree_sheet.get_image(9, 435, 65, 155), tree_sheet.get_image(102, 469, 97, 125)
         map_size = 100
         tile_size = 64
 
@@ -54,7 +67,7 @@ def main():
         screen.blit(text, ((SCREENWIDTH - text_width)/2, (SCREENHEIGHT - text_height)/2))
         pygame.display.flip()
         terrain_gen = GenTerrain(tile_size, map_size, map_size, tile_image)
-        tree_gen = GenTrees(tile_size, map_size, tree_image, 0.3)
+        tree_gen = GenTrees(tile_size, map_size, tree_image, trunk_image, 0.1)
 
         tile_list = pygame.sprite.Group()  # Add sprites to sprite groups
         for i in terrain_gen.tile_list:
@@ -86,6 +99,8 @@ def main():
         carry_on = True  # Allowing the user to close the window...
         clock = pygame.time.Clock()
 
+        move_sprites = (tile_list, tree_list, enemy_list)
+
         while carry_on:  # Main game loop
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -110,17 +125,8 @@ def main():
                     vx /= 1.414
                     vy /= 1.414
                     """
-                for i in tree_list:
-                    i.movex(vx)
-                    i.movey(vy)
-                for i in enemy_list:
-                    i.movex(vx)
-                    i.movey(vy)
-                for i in tile_list:
-                    i.movex(vx)
-                    i.movey(vy)
-                    ycoord += vy
-                    xcoord -= vx
+
+                ycoord, xcoord = movexy(move_sprites, vx, vy, xcoord, ycoord)
 
                 if keys[pygame.K_F3] and debug is False:
                     debug = True
@@ -130,20 +136,27 @@ def main():
                     pygame.time.wait(100)
 
                 pos = xcoord, ycoord
-                tile_list.update()  # Update sprite lists
-                tree_list.update()
-                player_sprites.update()
-                enemy_list.update(player)
 
                 # rendering code for terrain
                 for i in tile_list:
-                    if abs(i.rect.x - player.rect.x) < (SCREENWIDTH/2 + tile_size):
-                        if abs(i.rect.y - player.rect.y) < (SCREENHEIGHT/2 + tile_size):
+                    if abs(i.rect.x - player.rect.x) < (SCREENWIDTH / 2 + tile_size):
+                        if abs(i.rect.y - player.rect.y) < (SCREENHEIGHT / 2 + tile_size):
                             render_tile_list.add(i)
                 for i in tree_list:
-                    if abs(i.rect.x - player.rect.x) < (SCREENWIDTH / 2 + tile_size*2):
-                        if abs(i.rect.y - player.rect.y) < (SCREENHEIGHT / 2 + tile_size*2):
+                    if abs(i.rect.x - player.rect.x) < (SCREENWIDTH / 2 + tile_size * 2):
+                        if abs(i.rect.y - player.rect.y) < (SCREENHEIGHT / 2 + tile_size * 2):
                             render_tree_list.add(i)
+
+                # collision code
+                tree_hit_list = pygame.sprite.spritecollide(player, render_tree_list, False, pygame.sprite.collide_mask)
+                for tree in tree_hit_list:
+                    ycoord, xcoord = movexy(move_sprites, -vx, -vy, xcoord, ycoord)
+
+                # Update sprite lists
+                tile_list.update()
+                tree_list.update()
+                player_sprites.update()
+                enemy_list.update(player)
 
                 render_tile_list.draw(screen)  # Draw sprites (order matters)
                 player_sprites.draw(screen)

@@ -15,6 +15,7 @@ class Player(pygame.sprite.Sprite):
 
         self.image = sprite_sheet.get_image(0, 0, 64, 64)
         self.image_original = self.image
+        self.mask = pygame.mask.from_surface(self.image)
         self.speed = 5
         self.rect = self.image.get_rect()
         self.rect.x = 540 - self.rect.centerx
@@ -36,3 +37,4 @@ class Player(pygame.sprite.Sprite):
         angle = math.atan2(relx, rely)
         angle = math.degrees(angle)
         self.image = self.rot_center(angle)
+        self.mask = pygame.mask.from_surface(self.image)

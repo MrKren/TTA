@@ -6,12 +6,13 @@ from spritesheet import SpriteSheet
 
 class NPC(pygame.sprite.Sprite):
 
-    def __init__(self, player, speed):
+    def __init__(self, player, speed, screensize=(1080, 720)):
 
         super().__init__()
 
         sprite_sheet = SpriteSheet("enemy.png")
         self.image_original = sprite_sheet.get_image(0, 0, 64, 64)
+        self.image_original = pygame.transform.flip(self.image_original, False, True)
         self.image = self.image_original
         self.rect = self.image.get_rect()
         self.player = player
@@ -19,6 +20,7 @@ class NPC(pygame.sprite.Sprite):
         self.speed = speed
         self.time = 0
         self.move = "L"
+        self.screensize = screensize
 
     def rot_center(self, angle):
         """rotate an image while keeping its center and size"""
@@ -39,11 +41,14 @@ class NPC(pygame.sprite.Sprite):
         angle = math.atan2(relx, rely)
         angle = math.degrees(angle)
         self.image = self.rot_center(angle)
+
         if self.time > 10:
             self.move = random.choice(["L", "R", "U", "D"])
             self.time = 0
         else:
             self.ai_move(8, self.move)
+        if (0 < self.rect.centerx < self.screensize[0]) or (0 < self.rect.centery < self.screensize[1]):
+            self.ai_move(-8, self.move)
 
     def movex(self, speed):
         self.rect.x += speed
