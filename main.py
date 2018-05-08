@@ -5,6 +5,8 @@ from terrain_gen import GenTerrain, GenTrees
 from spritesheet import SpriteSheet
 from debugmode import debug_menu
 from npc_class import Enemy
+from text import add_text, text_size
+from weapon_class import Weapon
 
 GREEN = (20, 255, 140)  # useful colours
 GREY = (210, 210, 210)
@@ -20,6 +22,7 @@ SCREENWIDTH = 1080   # screen resolution
 SCREENHEIGHT = 720
 
 enemy_sheet = ["enemy_animation.png", "enemy.png"]
+weapon_axe_sheet = ["weapon_axe_idle.png", "weapon_axe_idle.png", "weapon_axe_idle.png"]
 
 
 def movexy(group, vx, vy, xcoord, ycoord):
@@ -80,6 +83,11 @@ def main():
         player = Player()
         player_sprites = pygame.sprite.Group()
         player_sprites.add(player)
+
+        weapon = Weapon(10, "Axe", weapon_axe_sheet)
+        weapon_sprites = pygame.sprite.Group()
+        weapon_sprites.add(weapon)
+
         enemy_list = pygame.sprite.Group()
         for i in range(5):
             i = Enemy(speed, enemy_sheet)
@@ -101,14 +109,21 @@ def main():
         clock = pygame.time.Clock()
 
         move_sprites = (tile_list, tree_list, enemy_list)
+        vulnerability = True
+        vul_count = 0
 
         while carry_on:  # Main game loop
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         carry_on = False
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        buttons_pressed = pygame.mouse.get_pressed()
+                        if buttons_pressed[0]:
+                            weapon.state = "attack"
 
                 screen.fill(BLACK)  # Drawing on Screen
 
+                # Movement code
                 keys = pygame.key.get_pressed()
 
                 vx = 0
@@ -121,7 +136,6 @@ def main():
                     vy = -speed
                 if keys[pygame.K_d]:
                     vx = -speed
-                # TODO fix diagonal speed bug
                 """ bug with diagonal speed code causes tiles and trees to glitch and move weirdly, possibly due to rendering code?
                 if vx != 0 and vy != 0:
                     vx /= 1.414
@@ -139,6 +153,8 @@ def main():
 
                 pos = xcoord, ycoord
 
+                # other keyboard adn mouse input
+
                 # rendering code for terrain
                 for i in tile_list:
                     if abs(i.rect.x - player.rect.x) < (SCREENWIDTH / 2 + tile_size):
@@ -150,24 +166,67 @@ def main():
                             render_tree_list.add(i)
 
                 # collision code
+
+                """Tree Collisions"""
                 tree_hit_list = pygame.sprite.spritecollide(player, render_tree_list, False, pygame.sprite.collide_mask)
-                for _ in tree_hit_list:
-                    ycoord, xcoord = movexy(move_sprites, -vx, -vy, xcoord, ycoord)
+                if not player.dead:
+                    for _ in tree_hit_list:
+                        ycoord, xcoord = movexy(move_sprites, -vx, -vy, xcoord, ycoord)
+
+                """Enemy Collisions"""
+                enemy_hit_list = pygame.sprite.spritecollide(player, enemy_list, False, pygame.sprite.collide_mask)
+                for _ in enemy_hit_list:
+                    if vulnerability:
+                        player.health -= 10
+                        vulnerability = False
+
+                if not vulnerability:
+                    vul_count += 1
+                    if vul_count > 30:
+                        vul_count = 0
+                        vulnerability = True
+
+                """Weapon Collisions"""
+                weapon_hit_list = pygame.sprite.spritecollide(weapon, enemy_list, False, pygame.sprite.collide_mask)
+                for enemy in weapon_hit_list:
+                    if not enemy.vulnerability:
+                        enemy.damaged(weapon.damage)
+                        print("damaged")
+
+                for enemy in enemy_list:
+                    if enemy.dead:
+                        enemy.kill()
+                        enemy = None
 
                 # Update sprite lists
                 tile_list.update()
                 tree_list.update()
                 player_sprites.update()
                 enemy_list.update(player)
+                weapon_sprites.update(player)
 
                 render_tile_list.draw(screen)  # Draw sprites (order matters)
                 enemy_list.draw(screen)
                 player_sprites.draw(screen)
+                weapon_sprites.draw(screen)
                 render_tree_list.draw(screen)
 
                 fps = clock.get_fps()
+
+                # debug menu
                 if debug:
                     debug_menu(fps, screen, pos, SCREENWIDTH)
+
+                # Inventory
+                add_text(12, ("Health:" + " " + str(round(player.health))), WHITE, (20, 30), screen)
+
+                # endgame
+                if player.dead:
+                    text_width, text_height = text_size(72, "Game Over")
+                    add_text(72, "Game Over", WHITE,
+                             ((SCREENWIDTH - text_width)/2, (SCREENHEIGHT - text_height - 200)/2),
+                             screen)
+                    vulnerability = False
 
                 pygame.display.flip()  # Refresh Screen
 

@@ -12,16 +12,36 @@ class NPC(pygame.sprite.Sprite):
 
         self.idle = Animation(sprite_sheets[0], 64, 6, 3)
         self.image = self.idle.images[0]
+        self.mask = pygame.mask.from_surface(self.image)
         self.image_original = self.idle.images[0]
         self.rect = self.image.get_rect()
+
         self.speed = speed
         self.time = 0
         self.move = "L"
         self.screensize = screensize
+        self.health = 20
+        self.dead = False
+        self.vulnerability = False
+        self.vul_count = 0
 
     def update(self, player):
         """General updates for NPC"""
         self.image = self.idle.update()
+        self.mask = pygame.mask.from_surface(self.image)
+
+        if self.vulnerability:
+            self.vul_count += 1
+            if self.vul_count >= 15:
+                self.vul_count = 0
+                self.vulnerability = False
+        if self.health <= 0:
+            self.dead = True
+            print("Dead")
+
+    def damaged(self, amount):
+        self.health -= amount
+        self.vulnerability = True
 
     def movex(self, speed):
         self.rect.x += speed
@@ -47,11 +67,14 @@ class Enemy(NPC):
 
     def update(self, player):
         """General updates for NPC"""
-        # rotating player
+
+        NPC.update(self, player)
+
         self.time += 1
         player_pos = player.rect.centerx, player.rect.centery
         self.image_original = self.idle.update()
         self.image = self.rot_center(player_pos)
+        self.mask = pygame.mask.from_surface(self.image)
 
         if self.time > 15:
             self.move = random.choice(["L", "R", "U", "D"])

@@ -1,6 +1,7 @@
 import pygame
 import math
 from spritesheet import SpriteSheet
+from animate import Animation
 
 
 class Player(pygame.sprite.Sprite):
@@ -13,16 +14,24 @@ class Player(pygame.sprite.Sprite):
 
         sprite_sheet = SpriteSheet('character.png')
 
-        self.image = sprite_sheet.get_image(0, 0, 64, 64)
+        self.image = sprite_sheet.get_image(0, 0, 128, 128)
         self.image_original = self.image
         self.mask = pygame.mask.from_surface(self.image)
-        self.speed = 5
         self.rect = self.image.get_rect()
         self.rect.x = 540 - self.rect.centerx
         self.rect.y = 360 - self.rect.centery
 
-    def rot_center(self, angle):
+        self.speed = 5
+        self.health = 100
+        self.dead = False
+        self.ghost = Animation("ghost.png", 64, 8, 3)
+
+    def rot_center(self):
         """rotate an image while keeping its center and size"""
+        x, y = pygame.mouse.get_pos()
+        relx, rely = x - self.rect.x, y - self.rect.y
+        angle = math.atan2(relx, rely)
+        angle = math.degrees(angle)
         orig_rect = self.image_original.get_rect()
         rot_image = pygame.transform.rotate(self.image_original, angle)
         rot_rect = orig_rect.copy()
@@ -32,9 +41,11 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         """Rotates the player so that it follows the mouse"""
-        x, y = pygame.mouse.get_pos()
-        relx, rely = x - self.rect.x, y - self.rect.y
-        angle = math.atan2(relx, rely)
-        angle = math.degrees(angle)
-        self.image = self.rot_center(angle)
-        self.mask = pygame.mask.from_surface(self.image)
+        if not self.dead:
+            self.image = self.rot_center()
+            self.mask = pygame.mask.from_surface(self.image)
+
+        if self.health <= 0:
+            self.dead = True
+            self.image = self.ghost.update()
+            self.mask = pygame.mask.from_surface(self.image)
