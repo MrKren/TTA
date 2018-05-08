@@ -3,11 +3,13 @@
     <words>
       <w>freesansbold</w>
       <w>movex</w>
+      <w>movexy</w>
       <w>movey</w>
       <w>pygame</w>
       <w>relx</w>
       <w>rougelike</w>
       <w>spritesheet</w>
+      <w>tilesize</w>
       <w>xcoord</w>
       <w>xpos</w>
       <w>xspeed</w>

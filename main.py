@@ -5,7 +5,7 @@ from player_class import Player     # Import classes
 from terrain_gen import GenTerrain, GenTrees
 from spritesheet import SpriteSheet
 from debugmode import debug_menu
-from npc_class import NPC
+from npc_class import Enemy
 
 GREEN = (20, 255, 140)  # useful colours
 GREY = (210, 210, 210)
@@ -20,6 +20,8 @@ BLACK = (0, 0, 0)
 SCREENWIDTH = 1080   # screen resolution
 SCREENHEIGHT = 720
 
+enemy_sheet = ["enemy_animation.png", "enemy.png"]
+
 
 def movexy(group, vx, vy, xcoord, ycoord):
     """Moves objects"""
@@ -27,7 +29,7 @@ def movexy(group, vx, vy, xcoord, ycoord):
         for j in i:
             j.movex(vx)
             j.movey(vy)
-    for i in group[0]:
+    for _ in group[0]:
         ycoord += vy
         xcoord -= vx
     return ycoord, xcoord
@@ -81,11 +83,12 @@ def main():
         player_sprites = pygame.sprite.Group()
         player_sprites.add(player)
         enemy_list = pygame.sprite.Group()
-        for i in range(10):
-            i = NPC(player, speed)
+        for i in range(5):
+            i = Enemy(speed, enemy_sheet)
             i.rect.x = random.randint(player.rect.x, player.rect.x + tile_size*4)
             i.rect.y = random.randint(player.rect.y, player.rect.y + tile_size*4)
             enemy_list.add(i)
+        print("Enemies", enemy_list)
 
         rand_x_pos = random.randint(tile_size, ((map_size-1)*tile_size)-SCREENWIDTH/2)
         rand_y_pos = random.randint(tile_size, ((map_size-1)*tile_size)-SCREENHEIGHT/2)
@@ -149,7 +152,7 @@ def main():
 
                 # collision code
                 tree_hit_list = pygame.sprite.spritecollide(player, render_tree_list, False, pygame.sprite.collide_mask)
-                for tree in tree_hit_list:
+                for _ in tree_hit_list:
                     ycoord, xcoord = movexy(move_sprites, -vx, -vy, xcoord, ycoord)
 
                 # Update sprite lists
@@ -159,9 +162,9 @@ def main():
                 enemy_list.update(player)
 
                 render_tile_list.draw(screen)  # Draw sprites (order matters)
+                enemy_list.draw(screen)
                 player_sprites.draw(screen)
                 render_tree_list.draw(screen)
-                enemy_list.draw(screen)
 
                 fps = clock.get_fps()
                 if debug:

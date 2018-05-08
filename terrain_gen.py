@@ -48,8 +48,8 @@ class GenTrees(object):
 
     def __init__(self, tile_size, map_size, images, mask_images, percentage):
 
-        global mask_image
         self.tree_list = []
+        mask_image = mask_images[0]
 
         for i in range(map_size-2):
             for j in range(map_size-3):
