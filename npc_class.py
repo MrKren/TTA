@@ -10,7 +10,7 @@ class NPC(pygame.sprite.Sprite):
 
         super().__init__()
 
-        self.idle = Animation(sprite_sheets[0], 64, 6, 0.5)
+        self.idle = Animation(sprite_sheets[0], 64, 6, 3)
         self.image = self.idle.images[0]
         self.image_original = self.idle.images[0]
         self.rect = self.image.get_rect()

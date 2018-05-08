@@ -1,6 +1,5 @@
 import pygame   # Requires pygame module 'pip install pygame'
 import random
-# import math
 from player_class import Player     # Import classes
 from terrain_gen import GenTerrain, GenTrees
 from spritesheet import SpriteSheet
@@ -29,9 +28,8 @@ def movexy(group, vx, vy, xcoord, ycoord):
         for j in i:
             j.movex(vx)
             j.movey(vy)
-    for _ in group[0]:
-        ycoord += vy
-        xcoord -= vx
+    ycoord += vy
+    xcoord -= vx
     return ycoord, xcoord
 
 
@@ -123,6 +121,7 @@ def main():
                     vy = -speed
                 if keys[pygame.K_d]:
                     vx = -speed
+                # TODO fix diagonal speed bug
                 """ bug with diagonal speed code causes tiles and trees to glitch and move weirdly, possibly due to rendering code?
                 if vx != 0 and vy != 0:
                     vx /= 1.414
@@ -168,7 +167,7 @@ def main():
 
                 fps = clock.get_fps()
                 if debug:
-                    debug_menu(fps, screen, pos, map_size, SCREENWIDTH)
+                    debug_menu(fps, screen, pos, SCREENWIDTH)
 
                 pygame.display.flip()  # Refresh Screen
 

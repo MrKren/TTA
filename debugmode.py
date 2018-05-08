@@ -3,7 +3,7 @@ import psutil
 import os
 
 
-def debug_menu(fps, screen, pos, map_size, screenwidth=1080):
+def debug_menu(fps, screen, pos, screenwidth=1080):
         """Creates a display of useful numbers"""
 
         # fps counter
@@ -15,7 +15,7 @@ def debug_menu(fps, screen, pos, map_size, screenwidth=1080):
         # position
         coord = []
         for i in pos:
-            i = round(i/(64*map_size**2), 1)  # Don't understand this conversion but it works so ¯\_(ツ)_/¯
+            i = round(i/64, 1)
             coord.append(i)
         coord_text = font.render(str(coord), 1, (255, 255, 255))
         screen.blit(coord_text, ((screenwidth - 100), 17))
