@@ -1,2 +1,2 @@
 # TTA
-**Python rougelike game**
+**Python roguelike game**
