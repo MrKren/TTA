@@ -23,6 +23,7 @@ class Player(pygame.sprite.Sprite):
 
         self.speed = 5
         self.health = 100
+        self.max_health = 100
         self.dead = False
         self.ghost = Animation("ghost.png", 64, 8, 3)
 

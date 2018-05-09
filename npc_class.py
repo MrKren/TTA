@@ -37,7 +37,6 @@ class NPC(pygame.sprite.Sprite):
                 self.vulnerability = False
         if self.health <= 0:
             self.dead = True
-            print("Dead")
 
     def damaged(self, amount):
         self.health -= amount

@@ -7,6 +7,7 @@ from debugmode import debug_menu
 from npc_class import Enemy
 from text import add_text, text_size
 from weapon_class import Weapon
+from gui import GUI, HealthBar, HealthBarBack
 
 GREEN = (20, 255, 140)  # useful colours
 GREY = (210, 210, 210)
@@ -105,12 +106,24 @@ def main():
             i.movex(-rand_x_pos)
             i.movey(-rand_y_pos)
 
+        # Creating GUI
+        health_bar_back = HealthBarBack(player)
+        health_bar = HealthBar(player)
+        gui = GUI()
+        gui_sprites = pygame.sprite.Group()
+        gui_sprites.add(health_bar_back)
+        gui_sprites.add(health_bar)
+        gui_sprites.add(gui)
+
+
         carry_on = True  # Allowing the user to close the window...
         clock = pygame.time.Clock()
 
         move_sprites = (tile_list, tree_list, enemy_list)
         vulnerability = True
         vul_count = 0
+        weapon_dead = False
+        weapon_hit_list = []
 
         while carry_on:  # Main game loop
                 for event in pygame.event.get():
@@ -118,7 +131,7 @@ def main():
                         carry_on = False
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         buttons_pressed = pygame.mouse.get_pressed()
-                        if buttons_pressed[0]:
+                        if buttons_pressed[0] and not player.dead:
                             weapon.state = "attack"
 
                 screen.fill(BLACK)  # Drawing on Screen
@@ -153,7 +166,7 @@ def main():
 
                 pos = xcoord, ycoord
 
-                # other keyboard adn mouse input
+                # other keyboard and mouse input
 
                 # rendering code for terrain
                 for i in tile_list:
@@ -182,21 +195,24 @@ def main():
 
                 if not vulnerability:
                     vul_count += 1
-                    if vul_count > 30:
+                    if vul_count > 10:
                         vul_count = 0
                         vulnerability = True
 
                 """Weapon Collisions"""
-                weapon_hit_list = pygame.sprite.spritecollide(weapon, enemy_list, False, pygame.sprite.collide_mask)
+                if not player.dead:
+                    weapon_hit_list = pygame.sprite.spritecollide(weapon, enemy_list, False, pygame.sprite.collide_mask)
                 for enemy in weapon_hit_list:
-                    if not enemy.vulnerability:
-                        enemy.damaged(weapon.damage)
-                        print("damaged")
+                    if not player.dead:
+                        if not enemy.vulnerability and weapon.state == "attack":
+                            enemy.damaged(weapon.damage)
+                            print("damaged")
 
                 for enemy in enemy_list:
                     if enemy.dead:
                         enemy.kill()
-                        enemy = None
+                        enemy = "Dead"
+                        print(enemy)
 
                 # Update sprite lists
                 tile_list.update()
@@ -204,12 +220,14 @@ def main():
                 player_sprites.update()
                 enemy_list.update(player)
                 weapon_sprites.update(player)
+                gui_sprites.update(player)
 
                 render_tile_list.draw(screen)  # Draw sprites (order matters)
                 enemy_list.draw(screen)
                 player_sprites.draw(screen)
                 weapon_sprites.draw(screen)
                 render_tree_list.draw(screen)
+                gui_sprites.draw(screen)
 
                 fps = clock.get_fps()
 
@@ -218,7 +236,7 @@ def main():
                     debug_menu(fps, screen, pos, SCREENWIDTH)
 
                 # Inventory
-                add_text(12, ("Health:" + " " + str(round(player.health))), WHITE, (20, 30), screen)
+                add_text(10, ("Health:" + " " + str(round(player.health))), WHITE, (70, 149), screen)
 
                 # endgame
                 if player.dead:
@@ -227,6 +245,10 @@ def main():
                              ((SCREENWIDTH - text_width)/2, (SCREENHEIGHT - text_height - 200)/2),
                              screen)
                     vulnerability = False
+                    if not weapon_dead:
+                        weapon_dead = True
+                        weapon.kill()
+                        weapon = None
 
                 pygame.display.flip()  # Refresh Screen
 
